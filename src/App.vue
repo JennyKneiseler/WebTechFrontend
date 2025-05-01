@@ -1,47 +1,48 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { ref, onMounted } from 'vue'
+
+// Reaktive Liste für Restaurants
+const restaurants = ref([])
+
+// Lädt Daten beim Start
+onMounted(async () => {
+  try {
+    const response = await fetch('http://localhost:8080/berliner-restaurantauswahl')
+    restaurants.value = await response.json()
+  } catch (error) {
+    console.error('Fehler beim Laden der Restaurants:', error)
+  }
+})
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <div class="container">
+    <h1>Berliner Restaurantauswahl</h1>
+    <ul v-if="restaurants.length">
+      <li v-for="r in restaurants" :key="r.name">
+        <strong>{{ r.name }}</strong><br />
+        Adresse: {{ r.adresse }}<br />
+        Öffnungszeiten: {{ r.oeffnungszeiten }}<br />
+        Kategorie: {{ r.kategorie }}
+        <hr />
+      </li>
+    </ul>
+    <p v-else>Keine Restaurants geladen...</p>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+.container {
+  max-width: 600px;
+  margin: 2rem auto;
+  font-family: sans-serif;
 }
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+li {
+  margin-bottom: 1rem;
 }
 </style>
+
+
+
+
+
