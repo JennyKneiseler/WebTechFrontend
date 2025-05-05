@@ -1,6 +1,6 @@
 # webtechfrontend
 
-//Projekt von Jenny Kneiseler und Edith Thon
+### Projekt von Jenny Kneiseler und Edith Thon
 
 This template should help get you started developing with Vue 3 in Vite.
 
