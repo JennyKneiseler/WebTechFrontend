@@ -1,10 +1,12 @@
+//gibt wissen vom Backend ans frontend
+//ref = reaktive daten (ändert sich was im backend ändert es sich hier automatisch)
+
 <script setup>
 import { ref, onMounted } from 'vue'
-
+import RestaurantListe from './components/Restaurantlist.vue'
 
 const restaurants = ref([])
 
-//hier wird das ganze gestartet wenn man die seite aufruft
 onMounted(async () => {
   try {
     const response = await fetch('http://localhost:8080/berliner-restaurantauswahl')
@@ -15,21 +17,10 @@ onMounted(async () => {
 })
 </script>
 
-//Daten von backend werden verarrbeitet
 <template>
   <div class="container">
     <h1>Berliner Restaurantauswahl</h1>
-    <ul v-if="restaurants.length">
-      <li v-for="r in restaurants" :key="r.name">
-        <strong>{{ r.name }}</strong><br />
-        Adresse: {{ r.address }}<br />
-        Öffnungszeiten: {{ r.businesshours }}<br />
-        Kategorie: {{ r.category
-        }}
-        <hr />
-      </li>
-    </ul>
-    <p v-else>Keine Restaurants geladen...</p>
+    <RestaurantListe :restaurants="restaurants" />
   </div>
 </template>
 
@@ -43,8 +34,3 @@ li {
   margin-bottom: 1rem;
 }
 </style>
-
-
-
-
-
