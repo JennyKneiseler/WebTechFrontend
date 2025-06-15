@@ -10,7 +10,7 @@
       <hr />
     </li>
   </ul>
-  <p v-else>Keine Restaurants geladen...</p>
+  <p v-else>Aktuell gibt es keine Restaurants...</p>
 </template>
 
 <script>

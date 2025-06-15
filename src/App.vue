@@ -9,7 +9,8 @@ const restaurants = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://localhost:8080/berliner-restaurantauswahl')
+    const response = await fetch("https://webtechprojekt-tjik.onrender.com/berliner-restaurantauswahl")
+
     restaurants.value = await response.json()
   } catch (error) {
     console.error('Fehler beim Laden der Restaurants:', error)
