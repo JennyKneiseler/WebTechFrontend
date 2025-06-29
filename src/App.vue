@@ -110,16 +110,26 @@ function toggleDarkMode() {
 
 <style scoped>
 /* === LIGHT MODE (Standard) === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 .app {
   min-height: 100vh;
+  width: 100vw;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   transition: all 0.3s ease;
+  margin: 0;
+  padding: 0;
 }
 
 .container {
-  margin: 0 auto;
-  padding: 1rem;
+  width: 100%;
+  max-width: none;
+  padding: 2rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
 }
 
 .app-header {
@@ -131,6 +141,7 @@ function toggleDarkMode() {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .app-header h1 {
@@ -162,6 +173,7 @@ function toggleDarkMode() {
   border-radius: 12px;
   margin-bottom: 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .form-section h2 {
@@ -209,7 +221,7 @@ function toggleDarkMode() {
   box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
 }
 
-/* === DARK MODE === */
+/*DARK MODE*/
 .app.dark-mode {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
 }
@@ -253,22 +265,5 @@ function toggleDarkMode() {
 
 .dark-mode .form-input::placeholder {
   color: #a0aec0;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .container {
-    padding: 1rem;
-  }
-
-  .app-header {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .form {
-    grid-template-columns: 1fr;
-  }
 }
 </style>
