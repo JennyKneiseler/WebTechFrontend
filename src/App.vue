@@ -73,21 +73,21 @@ function toggleDarkMode() {
      </header>
 
      //Restaurants werden hinzugefüht
-     <div class="from-section">
+     <div class="form-section">
        <h2>Neues Restaurant hinzufügen</h2>
-       <div class="from">
+       <div class="form">
          <input
          v-model="neuerRestaurantName"
          placeholder="Restaurant Name"
          class="form-input"
          />
          <input
-             v-model="neuerAdresse"
+             v-model="neueAdresse"
              placeholder="Adresse"
              class="form-input"
          />
          <input
-             v-model="neuerZeiten"
+             v-model="neueZeiten"
              placeholder="Öffnungszeiten"
              class="form-input"
          />
