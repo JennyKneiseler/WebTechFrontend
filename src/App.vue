@@ -117,9 +117,8 @@ function toggleDarkMode() {
 }
 
 .container {
-  max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
