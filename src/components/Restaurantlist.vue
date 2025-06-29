@@ -61,7 +61,17 @@
         >
         {{ r.showNotes ? `Notizen verbergen` : 'Notizen hinzufügen'}}
       </button>
+
+/*Lösch Button*/
+      <button
+          @click="deleteRestaurant(r.id)"
+          class="delete-btn"
+      >
+        🗑️ Löschen
+      </button>
     </div>
+
+
 
 /*Hier entsteht die Notizen Section*/
     <div v-if="r.showNotes" class="notes-section">
@@ -138,6 +148,24 @@ export default {
       return enhancedRestaurants.value
     })
 
+    const deleteRestaurant = async (id) => {
+      try {
+        const response = await fetch(`https://webtechprojekt-tjik.onrender.com/berliner-restaurantauswahl/${id}`, {
+          method: "DELETE"
+        })
+
+        if (response.ok) {
+          // Optional: Eintrag auch lokal löschen, damit es sofort sichtbar ist
+          props.restaurants.splice(props.restaurants.findIndex(r => r.id === id), 1)
+        } else {
+          console.error("Fehler beim Löschen:", await response.text())
+        }
+      } catch (error) {
+        console.error("Fehler beim Löschen:", error)
+      }
+    }
+
+
     // Toggle Favorit
     const toggleFavorite = (restaurant) => {
       const restaurantId = restaurant.id || restaurant.name
@@ -196,7 +224,8 @@ export default {
       toggleFavorite,
       saveNotes,
       setRating,
-      toggleNotes
+      toggleNotes,
+      deleteRestaurant
     }
   }
 }
@@ -337,4 +366,21 @@ hr {
   border: none;
   border-top: 1px solid #eee;
 }
+
+.delete-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #dc3545;
+  background: white;
+  color: #dc3545;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 0.5rem;
+}
+
+.delete-btn:hover {
+  background: #dc3545;
+  color: white;
+}
+
 </style>
