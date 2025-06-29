@@ -1,8 +1,8 @@
-//Dient dazu eine Liste von Restaurants anzuzeigen die im Backend erstellt wurde
+/*Dient dazu eine Liste von Restaurants anzuzeigen die im Backend erstellt wurde*/
 
-<<template>
+<template>
 <div>
-  //Hier machen wir ein Filter für die Favoriten
+  /*Hier machen wir ein Filter für die Favoriten*/
   <div class="filter-section">
     <button
       @click="showOnlyFavorites = !showOnlyFavorites"
@@ -18,12 +18,12 @@
 <ul v-if="filteredRestaurants.length" class="restaurant-list">
   <li v-for="r in filteredRestaurants" :key="r.id" class="restaurant-card">
 
-    //Restaurant Infos
+    /*Restaurant Infos*/
     <div class="restaurant-info">
       <strong class="restaurant-name">{{ r.name }}</strong>
 
 
-    //HIer machen wir die Bewertung mit Sternen
+    /*HIer machen wir die Bewertung mit Sternen*/
     <div class="rating-section">
       <span v-for="star in 5"
             :key="star"
@@ -33,7 +33,6 @@
             >
         ⭐
       </span>
-
       <span class="rating-text">({{ r.rating || 0}}/5)</span>
     </div>
 
@@ -44,9 +43,9 @@
     </div>
 </div>
 
-//Aktion Buttons werden erstelllt
+/*Aktion Buttons werden erstelllt*/
     <div class="action-section">
-      //Favoriten Button erstellen
+      /*Favoriten Button erstellen*/
       <button
         @click="toggleFavorite(r)"
         class="favorite-btn"
@@ -55,7 +54,7 @@
         {{ r.isFavorite ? '❤️ Favorisiert' : '🤍 Favorisieren' }}
       </button>
 
-  //Notizen toggle
+  /*Notizen toggle*/
       <button
         @click="toggleNotes(r)"
         class="notes-toggle-btn"
@@ -64,7 +63,7 @@
       </button>
     </div>
 
-//Hier entsteht die Notizen Section
+/*Hier entsteht die Notizen Section*/
     <div v-if="r.showNotes" class="notes-section">
       <textarea
         v-model="r.notes"
@@ -88,87 +87,121 @@
 </template>
 
 <script>
+import { ref, computed, watch } from 'vue'
+
 export default {
   props: ['restaurants'],
-  data() {
-    return {
-      showOnlyFavorites: false,
-      localRestaurants: []
+  setup(props) {
+    const showOnlyFavorites = ref(false)
+    const localRestaurantData = ref({})
+
+    // Lade alle lokalen Daten beim Start
+    const loadAllLocalData = () => {
+      const data = {}
+      props.restaurants.forEach(restaurant => {
+        const key = `restaurant_${restaurant.id || restaurant.name}`
+        const savedData = localStorage.getItem(key)
+        if (savedData) {
+          data[restaurant.id || restaurant.name] = JSON.parse(savedData)
+        }
+      })
+      localRestaurantData.value = data
     }
-  },
-  computed: {
-    filteredRestaurants() {
-      if (this.showOnlyFavorites) {
-        return this.enhancedRestaurants.filter(r => r.isFavorite)
-      }
-      return this.enhancedRestaurants
-    },
-    enhancedRestaurants() {
-      return this.restaurants.map(restaurant => {
-        //Hier laden wir die Lokalen Dat3n also alles was wir vorhin Programmiert haben hier or
-        const localData = this.getLocalData(restaurant.id || restaurant.name)
+
+    // Speichere lokale Daten
+    const saveLocalData = (restaurantId, data) => {
+      const key = `restaurant_${restaurantId}`
+      localStorage.setItem(key, JSON.stringify(data))
+      // Update auch die lokalen reactive Daten
+      localRestaurantData.value[restaurantId] = data
+    }
+
+    // Erweiterte Restaurants mit lokalen Daten
+    const enhancedRestaurants = computed(() => {
+      return props.restaurants.map(restaurant => {
+        const localData = localRestaurantData.value[restaurant.id || restaurant.name] || {}
         return {
           ...restaurant,
           isFavorite: localData.isFavorite || false,
           notes: localData.notes || '',
           rating: localData.rating || 0,
-          showNotes: false
+          showNotes: localData.showNotes || false
         }
       })
-    }
-  },
-  //Hier sorgen wir jetzt dafür das favoriten hinzugefügt und entrfernt werden können
-  methods: {
-    toggleFavorite(restaurant) {
+    })
+
+    // Gefilterte Restaurants
+    const filteredRestaurants = computed(() => {
+      if (showOnlyFavorites.value) {
+        return enhancedRestaurants.value.filter(r => r.isFavorite)
+      }
+      return enhancedRestaurants.value
+    })
+
+    // Toggle Favorit
+    const toggleFavorite = (restaurant) => {
+      const restaurantId = restaurant.id || restaurant.name
+      const currentData = localRestaurantData.value[restaurantId] || {}
       const newFavoriteStatus = !restaurant.isFavorite
-      restaurant.isFavorite = newFavoriteStatus
 
-      //Wir speichern das jetzt in locaStorage
-      this.saveLocalData(restaurant.id || restaurant.name, {
-        isFavorite: newFavoriteStatus,
-        notes: restaurant.notes,
-        rating: restaurant.rating
+      saveLocalData(restaurantId, {
+        ...currentData,
+        isFavorite: newFavoriteStatus
       })
-    },
+    }
 
-    //Wir speichern jetzt die Notizen sonnst alles weg
-    saveNotes(restaurant) {
-      this.saveLocalData(restaurant.id || restaurant.name, {
-        isFavorite: restaurant.isFavorite,
-        notes: restaurant.notes,
-        rating: restaurant.rating
+    // Speichere Notizen
+    const saveNotes = (restaurant) => {
+      const restaurantId = restaurant.id || restaurant.name
+      const currentData = localRestaurantData.value[restaurantId] || {}
+
+      saveLocalData(restaurantId, {
+        ...currentData,
+        notes: restaurant.notes
       })
-    },
-    //Hier sorgen wir daafür das die Bewertung gesetzt wird
-    setRating(restaurant, rating) {
-      restaurant.rating = rating
-      this.saveLocalData(restaurant.id || restaurant.name, {
-        isFavorite: restaurant.isFavorite,
-        notes: restaurant.notes,
+    }
+
+    // Setze Bewertung
+    const setRating = (restaurant, rating) => {
+      const restaurantId = restaurant.id || restaurant.name
+      const currentData = localRestaurantData.value[restaurantId] || {}
+
+      saveLocalData(restaurantId, {
+        ...currentData,
         rating: rating
       })
-    },
+    }
 
-    //Hierr machen wir das ein und ausblenden der Notizen, sonnst "Wow ich erkenne nichts..."
-    toggleNotes(restaurant) {
-      restaurant.showNotes = !restaurant.showNotes
-    },
+    // Toggle Notizen
+    const toggleNotes = (restaurant) => {
+      const restaurantId = restaurant.id || restaurant.name
+      const currentData = localRestaurantData.value[restaurantId] || {}
+      const newShowNotes = !restaurant.showNotes
 
-    //Wir speichern die Lokalen Daten...
-    saveLocalData(restaurantId, data) {
-      const key = `restaurant_${restaurantId}`//ähnlich wie in Statistik you know
-      localStorage.setItem(key, JSON.stringify(data))
-    },
-    getLocalData(restaurantId) {
-      const key = `restaurant_${restaurantId}`
-      const savedData = localStorage.getItem(key)
-      return savedData ? JSON.parse(savedData) : {}
+      saveLocalData(restaurantId, {
+        ...currentData,
+        showNotes: newShowNotes
+      })
+    }
+
+    // Lade Daten wenn sich die Restaurants ändern
+    watch(() => props.restaurants, () => {
+      loadAllLocalData()
+    }, { immediate: true })
+
+    return {
+      showOnlyFavorites,
+      filteredRestaurants,
+      enhancedRestaurants,
+      toggleFavorite,
+      saveNotes,
+      setRating,
+      toggleNotes
     }
   }
 }
 </script>
 
-//Hier kommt alles mit Stiley Miley
 <style scoped>
 .filter-section {
   margin-bottom: 1rem;
